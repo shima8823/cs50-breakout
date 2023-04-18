@@ -29,6 +29,7 @@ function PlayState:enter(params)
     self.highScores = params.highScores
     self.level = params.level
     self.recoverPoints = 1500
+    self.haveKey = false
     -- give ball random starting velocity
     params.ball.dx = math.random(-200, 200)
     params.ball.dy = math.random(-50, -60)
@@ -96,23 +97,28 @@ function PlayState:update(dt)
     
             -- only check collision if we're in play
             if brick.inPlay and ball:collides(brick) then
+                if brick.locked and self.haveKey then
+                    brick.locked = false
+                    gSounds['brick-hit-2']:play()
+                elseif not brick.locked then
     
-                -- add to score
-                self.score = self.score + (brick.tier * 200 + brick.color * 25)
-    
-                -- trigger the brick's hit function, which removes it from play
-                brick:hit()
-    
-                -- if we have enough points, recover a point of health
-                if self.score - self.prevScore > self.recoverPoints then
-                    -- can't go above 3 health
-                    self.health = math.min(3, self.health + 1)
-    
-                    -- multiply recover points by 2
-                    self.recoverPoints = math.min(100000, self.recoverPoints * 2)
-    
-                    -- play recover sound effect
-                    gSounds['recover']:play()
+                    -- add to score
+                    self.score = self.score + (brick.tier * 200 + brick.color * 25)
+        
+                    -- trigger the brick's hit function, which removes it from play
+                    brick:hit()
+        
+                    -- if we have enough points, recover a point of health
+                    if self.score - self.prevScore > self.recoverPoints then
+                        -- can't go above 3 health
+                        self.health = math.min(3, self.health + 1)
+        
+                        -- multiply recover points by 2
+                        self.recoverPoints = math.min(100000, self.recoverPoints * 2)
+        
+                        -- play recover sound effect
+                        gSounds['recover']:play()
+                    end
                 end
     
                 --
@@ -166,15 +172,18 @@ function PlayState:update(dt)
     
             if brick.item and brick.item.inPlay and brick.item:collides(self.paddle) then
                 brick.item:hit()
-
-                -- create new ball
-                local newBall = Ball()
-                newBall.skin = math.random(7)
-                newBall.x = self.paddle.x + (self.paddle.width / 2) - 4
-                newBall.y = self.paddle.y - 8
-                newBall.dx = math.random(-200, 200)
-                newBall.dy = math.random(-50, -60)
-                table.insert(self.balls, newBall)
+                if brick.item.skin == 3 then
+                    -- create new ball
+                    local newBall = Ball()
+                    newBall.skin = math.random(7)
+                    newBall.x = self.paddle.x + (self.paddle.width / 2) - 4
+                    newBall.y = self.paddle.y - 8
+                    newBall.dx = math.random(-200, 200)
+                    newBall.dy = math.random(-50, -60)
+                    table.insert(self.balls, newBall)
+                elseif brick.item.skin == 4 then
+                    self.haveKey = true
+                end
             end
         end
 
