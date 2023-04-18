@@ -71,21 +71,21 @@ function LevelMaker.createMap(level)
         local solidColor = math.random(1, highestColor)
         local solidTier = math.random(0, highestTier)
 
-        -- item flag
-        local itemFlag = math.random(2) == 1 and true or false
-
+        
         for x = 1, numCols do
             -- if skipping is turned on and we're on a skip iteration...
             if skipPattern and skipFlag then
                 -- turn skipping off for the next iteration
                 skipFlag = not skipFlag
-
+                
                 -- Lua doesn't have a continue statement, so this is the workaround
                 goto continue
             else
                 -- flip the flag to true on an iteration we don't use it
                 skipFlag = not skipFlag
             end
+            -- item flag
+            local itemFlag = math.random(2) == 1 and true or false
 
             -- x-coordinate
             local brickX = 
