@@ -19,7 +19,8 @@ function VictoryState:enter(params)
     self.highScores = params.highScores
     self.paddle = params.paddle
     self.health = params.health
-    self.ball = params.ball
+    self.ball = Ball()
+    self.ball.skin = math.random(7)
     self.recoverPoints = params.recoverPoints
 end
 
