@@ -22,6 +22,7 @@ function ServeState:enter(params)
     self.bricks = params.bricks
     self.health = params.health
     self.score = params.score
+    self.prevScore = params.prevScore
     self.highScores = params.highScores
     self.level = params.level
     self.recoverPoints = params.recoverPoints
@@ -44,6 +45,7 @@ function ServeState:update(dt)
             bricks = self.bricks,
             health = self.health,
             score = self.score,
+            prevScore = self.prevScore,
             highScores = self.highScores,
             ball = self.ball,
             level = self.level,
