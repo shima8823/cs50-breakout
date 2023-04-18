@@ -25,14 +25,30 @@ function PlayState:enter(params)
     self.bricks = params.bricks
     self.health = params.health
     self.score = params.score
+    self.prevScore = params.prevScore
     self.highScores = params.highScores
     self.level = params.level
-    self.recoverPoints = 5000
-    
+    self.recoverPoints = 1500
     -- give ball random starting velocity
     params.ball.dx = math.random(-200, 200)
     params.ball.dy = math.random(-50, -60)
     self.balls = {params.ball}
+    
+    self.paddle.size = self.health
+    -- switch paddle size
+    if self.paddle.size == 3 then
+        self.paddle.width = 96
+    elseif self.paddle.size == 2 then
+        self.paddle.width = 64
+    elseif self.paddle.size == 1 then
+        self.paddle.width = 32
+    end
+    -- 
+    if self.score - self.prevScore < 1000 and self.health == 1 then
+        self.paddle.size = 4
+        self.paddle.width = 128
+    end
+        
 end
 
 function PlayState:update(dt)
@@ -88,7 +104,7 @@ function PlayState:update(dt)
                 brick:hit()
     
                 -- if we have enough points, recover a point of health
-                if self.score > self.recoverPoints then
+                if self.score - self.prevScore > self.recoverPoints then
                     -- can't go above 3 health
                     self.health = math.min(3, self.health + 1)
     
@@ -179,6 +195,7 @@ function PlayState:update(dt)
                         bricks = self.bricks,
                         health = self.health,
                         score = self.score,
+                        prevScore = self.prevScore,
                         highScores = self.highScores,
                         level = self.level,
                         recoverPoints = self.recoverPoints
