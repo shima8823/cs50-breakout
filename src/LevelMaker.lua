@@ -23,7 +23,27 @@ ALTERNATE = 2       -- alternate colors
 SKIP = 3            -- skip every other block
 NONE = 4            -- no blocks this row
 
+MAX_LOCKED_BLOCKS = 3
+
 LevelMaker = Class{}
+
+local function selectCells(numRows, numCols, lockedBricksCount)
+    local cells = {}
+  
+    for i = 1, lockedBricksCount do
+        local row, col
+        row = math.random(numRows)
+        col = math.random(numCols)
+        cells[string.format("%d,%d", row, col)] = true
+    end
+  
+    return cells
+end
+
+local function ExistCell(cells, y, x)
+    local cellKey = string.format("%d,%d", y, x)
+    return cells[cellKey]
+end
 
 --[[
     Creates a table of Bricks to be returned to the main game, with different
@@ -46,6 +66,8 @@ function LevelMaker.createMap(level)
 
     -- highest color of the highest tier, no higher than 5
     local highestColor = math.min(5, level % 5 + 3)
+
+    local lockedPostionCells = selectCells(numRows, numCols, MAX_LOCKED_BLOCKS)
 
     -- lay out bricks such that they touch each other and fill the space
     for y = 1, numRows do
@@ -96,14 +118,26 @@ function LevelMaker.createMap(level)
 
             -- if itemFlag is true, create brick with item
             if itemFlag then
-                b = Brick(
-                    brickX,  
-                    -- y-coordinate
-                    y * 16,                  
-                    Item(brickX + 8, -- half of brick
-                    y * 16,
-                    3)
-                )
+                local itemKeyFlag = math.random(2) == 1 and true or false
+                if itemKeyFlag then
+                    b = Brick(
+                        brickX,  
+                        -- y-coordinate
+                        y * 16,                  
+                        Item(brickX + 8, -- half of brick
+                        y * 16,
+                        4)
+                    )
+                else
+                    b = Brick(
+                        brickX,  
+                        -- y-coordinate
+                        y * 16,                  
+                        Item(brickX + 8, -- half of brick
+                        y * 16,
+                        3)
+                    )
+                end
             else
                 b = Brick(brickX, y * 16)
             end
@@ -125,6 +159,9 @@ function LevelMaker.createMap(level)
                 b.tier = solidTier
             end 
 
+            if ExistCell(lockedPostionCells, y, x) then
+                b.locked = true
+            end
             table.insert(bricks, b)
 
             -- Lua's version of the 'continue' statement
