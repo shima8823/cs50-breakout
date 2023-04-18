@@ -71,6 +71,9 @@ function LevelMaker.createMap(level)
         local solidColor = math.random(1, highestColor)
         local solidTier = math.random(0, highestTier)
 
+        -- item flag
+        local itemFlag = math.random(2) == 1 and true or false
+
         for x = 1, numCols do
             -- if skipping is turned on and we're on a skip iteration...
             if skipPattern and skipFlag then
@@ -84,16 +87,26 @@ function LevelMaker.createMap(level)
                 skipFlag = not skipFlag
             end
 
-            b = Brick(
-                -- x-coordinate
+            -- x-coordinate
+            local brickX = 
                 (x-1)                   -- decrement x by 1 because tables are 1-indexed, coords are 0
                 * 32                    -- multiply by 32, the brick width
                 + 8                     -- the screen should have 8 pixels of padding; we can fit 13 cols + 16 pixels total
-                + (13 - numCols) * 16,  -- left-side padding for when there are fewer than 13 columns
-                
-                -- y-coordinate
-                y * 16                  -- just use y * 16, since we need top padding anyway
-            )
+                + (13 - numCols) * 16  -- left-side padding for when there are fewer than 13 columns
+
+            -- if itemFlag is true, create brick with item
+            if itemFlag then
+                b = Brick(
+                    brickX,  
+                    -- y-coordinate
+                    y * 16,                  
+                    Item(brickX + 8, -- half of brick
+                    y * 16,
+                    3)
+                )
+            else
+                b = Brick(brickX, y * 16)
+            end
 
             -- if we're alternating, figure out which color/tier we're on
             if alternatePattern and alternateFlag then

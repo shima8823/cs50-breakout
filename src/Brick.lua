@@ -50,7 +50,7 @@ paletteColors = {
     }
 }
 
-function Brick:init(x, y)
+function Brick:init(x, y, item)
     -- used for coloring and score calculation
     self.tier = 0
     self.color = 1
@@ -62,6 +62,8 @@ function Brick:init(x, y)
     
     -- used to determine whether this brick should be rendered
     self.inPlay = true
+
+    self.item = item
 
     -- particle system belonging to the brick, emitted on hit
     self.psystem = love.graphics.newParticleSystem(gTextures['particle'], 64)
@@ -117,6 +119,10 @@ function Brick:hit()
         -- if we're in the first tier and the base color, remove brick from play
         if self.color == 1 then
             self.inPlay = false
+            -- If the brick is a bonus item, generate a bonus item.
+            if self.item then
+                self.item.inPlay = true
+            end
         else
             self.color = self.color - 1
         end
